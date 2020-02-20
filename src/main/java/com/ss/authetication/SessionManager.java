@@ -19,9 +19,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ss.constant.SmartRoles;
+import com.ss.model.Company;
 import com.ss.model.User;
 import com.ss.model.UserSession;
 import com.ss.model.dto.DtoUser;
+import com.ss.repository.RepositoryCompany;
 import com.ss.repository.RepositoryUser;
 import com.ss.repository.RepositoryUserSession;
 import com.ss.util.UtilRandomKey;
@@ -36,10 +38,10 @@ public class SessionManager {
 	@Autowired
 	RepositoryUser repositoryUser;
 	
-	/*@Autowired
+	@Autowired
 	RepositoryCompany repositoryCompany;
 	
-	@Autowired
+	/*@Autowired
 	ServiceLogin serviceLogin;
 	
 	@Autowired
@@ -63,7 +65,7 @@ public class SessionManager {
 			getUniqueSessionId(userId,localIPAddress);
 		}
 		
-		session = null;//repositoryUserSession.findByUserUserIdAndIsDeleted(userId, false);
+		session = repositoryUserSession.findByUserUserIdAndIsDeleted(userId, false);
 		if (session == null) {
 			LOGGER.info("SessionLog is null as user id does not exist");
 			session = new UserSession();
@@ -114,9 +116,9 @@ public UserSession validateUserSessionId(HttpServletRequest request) {
 			else
 			{
 				
-			/*Company company=repositoryCompany.findByTenantIdAndIsDeleted(companyTenantId,false);
-			Boolean flag= serviceLogin.checkValidCompanyAccess(company.getCompanyId(), idCurrentUser);*/
-				Boolean	flag=true;
+			Company company=repositoryCompany.findByTenantIdAndIsDeleted(companyTenantId,false);
+			//Boolean flag= serviceLogin.checkValidCompanyAccess(company.getCompanyId(), idCurrentUser);			
+			Boolean	flag=true;
 				if(flag){
 					return session;
 				}

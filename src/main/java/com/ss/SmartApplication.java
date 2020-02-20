@@ -17,7 +17,7 @@ public class SmartApplication extends SpringBootServletInitializer{
 	public static void main(String[] args) {
 		SpringApplication.run(SmartApplication.class, args);
 	}
-	/* (non-Javadoc)
+	/** (non-Javadoc)
 	 * @see org.springframework.boot.context.web.SpringBootServletInitializer#configure(org.springframework.boot.builder.SpringApplicationBuilder)
 	 */
 	@Override

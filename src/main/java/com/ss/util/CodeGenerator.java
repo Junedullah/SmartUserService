@@ -9,21 +9,21 @@ package com.ss.util;
  * Version: 
  */
 
-/*package com.smartsoft.util;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.smartsoft.constant.SmartCodeType;
-import com.smartsoft.model.AccessRole;
-import com.smartsoft.model.Company;
-import com.smartsoft.model.RoleGroup;
-import com.smartsoft.model.User;
-import com.smartsoft.model.UserGroup;
-import com.smartsoft.repository.RepositoryAccessRole;
-import com.smartsoft.repository.RepositoryCompany;
-import com.smartsoft.repository.RepositoryRoleGroup;
-import com.smartsoft.repository.RepositoryUser;
-import com.smartsoft.repository.RepositoryUserGroup;
+import com.ss.constant.SmartCodeType;
+import com.ss.model.AccessRole;
+import com.ss.model.Company;
+import com.ss.model.RoleGroup;
+import com.ss.model.User;
+import com.ss.model.UserGroup;
+import com.ss.repository.RepositoryAccessRole;
+import com.ss.repository.RepositoryCompany;
+import com.ss.repository.RepositoryRoleGroup;
+import com.ss.repository.RepositoryUser;
+import com.ss.repository.RepositoryUserGroup;
 
 
 
@@ -45,10 +45,10 @@ public class CodeGenerator {
 	@Autowired
 	RepositoryCompany repositoryCompany;
 
-	*//**
+	/**
 	 * @param codeType
 	 * @return
-	 *//*
+	 */
 	public String getGeneratedCode(String codeType) {
 		String generatedCode = null;
 		int codeId = 1000;
@@ -124,4 +124,3 @@ public class CodeGenerator {
 		return generatedCode;
 	}
 }
-*/

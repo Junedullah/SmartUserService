@@ -26,7 +26,7 @@ import javax.persistence.TemporalType;
 
 
 @Entity @org.hibernate.annotations.Entity(dynamicInsert = true)
-@Table(name = "login_otps")
+@Table(name = "login_otp")
 @NamedQuery(name = "LoginOtp.findAll", query = "SELECT l FROM LoginOtp l")
 public class LoginOtp extends BaseEntity implements Serializable {
 	private static final long serialVersionUID = 1L;

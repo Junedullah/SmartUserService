@@ -1,6 +1,6 @@
-/*SmartSoftware User - Service */
+/**SmartSoftware User - Service */
 /**
- * Description: The persistent class for the country_master database table.
+ * Description: Interface for RepositoryCompany 
  * Name of Project: SmartSoftware
  * Created on: March 11, 2020
  * Modified on: March 11, 2020 11:19:38 AM
@@ -22,14 +22,6 @@ import org.springframework.stereotype.Repository;
 
 import com.ss.model.Company;
 
-/**
- * Description: Interface for RepositoryCompany 
- * Name of Project: BTI
- * Created on: May 17, 2017
- * Modified on: May 17, 2017 4:19:38 PM
- * @author seasia
- * Version: 
- */
 @Repository("repositoryCompany")
 public interface RepositoryCompany extends JpaRepository<Company, Integer> {
 

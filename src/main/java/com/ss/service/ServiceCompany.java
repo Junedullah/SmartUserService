@@ -1,6 +1,6 @@
-/*SmartSoftware User - Service */
+/**SmartSoftware User - Service */
 /**
- * Description: The persistent class for the country_master database table.
+ * Description: Service Company
  * Name of Project: SmartSoftware
  * Created on: March 11, 2020
  * Modified on: March 11, 2020 11:19:38 AM
@@ -41,12 +41,6 @@ import com.ss.util.DatabaseFactory;
 
 
 
-/**
- * Description: Service Company Name of Project: BTI Created on: May 15, 2017
- * Modified on: May 15, 2017 11:11:38 AM
- * 
- * @author seasia Version:
- */
 @Service("serviceCompany")
 public class ServiceCompany {
 
