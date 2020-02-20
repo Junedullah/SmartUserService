@@ -32,14 +32,11 @@ import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.smartsoft.model.LoginOtp;
-import com.smartsoft.model.UserSession;
-import com.smartsoft.model.WhitelistIp;
-import com.smartsoft.repository.RepositoryLoginOtp;
-import com.smartsoft.repository.RepositoryUserSession;
-import com.smartsoft.repository.RepositoryWhiteListIp;
 import com.ss.constant.SmartRoles;
+import com.ss.model.LoginOtp;
+import com.ss.model.UserSession;
 import com.ss.repository.RepositoryUser;
+import com.ss.repository.RepositoryUserSession;
 import com.ss.util.UtilFindIPAddress;
 import com.ss.util.UtilRandomKey;
 
@@ -56,11 +53,11 @@ public class SimpleUrlAuthenticationSuccessHandler implements AuthenticationSucc
 	RepositoryLoginOtp repositoryLoginOtp;
 	@Autowired
 	RepositoryWhiteListIp repositoryWhiteListIp;
- 
-	 (non-Javadoc)
-	 * @see org.springframework.security.web.authentication.AuthenticationSuccessHandler#onAuthenticationSuccess(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, org.springframework.security.core.Authentication)
-	 
-	@Override
+ */
+	/** (non-Javadoc)
+	  @see org.springframework.security.web.authentication.AuthenticationSuccessHandler#onAuthenticationSuccess(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, org.springframework.security.core.Authentication)
+	*/ 
+	/*@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 			Authentication authentication) throws IOException {
 		handle(request, response, authentication);

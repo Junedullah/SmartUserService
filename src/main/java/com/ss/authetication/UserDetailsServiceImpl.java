@@ -36,7 +36,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 	private static final Logger LOGGER = Logger.getLogger(UserDetailsServiceImpl.class);
 
-	/* (non-Javadoc)
+	/** (non-Javadoc)
 	 * @see org.springframework.security.core.userdetails.UserDetailsService#loadUserByUsername(java.lang.String)
 	 */
 	@Transactional(readOnly = true)
@@ -64,7 +64,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		boolean credentialsNonExpired = true;
 		boolean accountNonLocked = true;
 		Collection<GrantedAuthority> authorities = new ArrayList<>();
-	//	authorities.add(new GrantedAuthorityImpl(user.getRole().getRoleName()));
+		authorities.add(new GrantedAuthorityImpl(user.getRole().getRoleName()));
 		return new LoggedUser(userId, username, password, enabled, accountNonExpired,
 				credentialsNonExpired, accountNonLocked, authorities);
 	 
