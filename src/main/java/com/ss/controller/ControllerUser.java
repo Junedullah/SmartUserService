@@ -27,6 +27,7 @@ import com.ss.config.ResponseMessage;
 import com.ss.constant.Constant;
 import com.ss.constant.MessageLabel;
 import com.ss.model.User;
+import com.ss.model.UserDetail;
 import com.ss.model.UserSession;
 import com.ss.model.dto.DtoRequestResponseLog;
 import com.ss.model.dto.DtoSearch;
@@ -76,22 +77,22 @@ public class ControllerUser {
 	 * @param dtoUser
 	 * @return
 	 */
-	@RequestMapping(value = "/createUser", method = RequestMethod.POST/*, produces = "application/json"*/)
+	@RequestMapping(value = "/createUser", method = RequestMethod.POST, produces = "application/json"                                                                                                                                                                                    )
 	public ResponseMessage createUser(HttpServletRequest request, @RequestBody DtoUser dtoUser) {
 		ResponseMessage responseMessage = null;
-	//	UserSession session = sessionManager.validateUserSessionId(request);
-		/*if (session == null) {
+		UserSession session = sessionManager.validateUserSessionId(request);
+		if (session == null) {
 			responseMessage = new ResponseMessage(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED,
 					serviceResponse.getMessageByShortAndIsDeleted(MessageLabel.FORBIDDEN, false), false);
 			return responseMessage;
-		} else {*/
-		//	User userNameCheck = repositoryUser.findByusernameAndIsDeleted(dtoUser.getEmail(), false);
-		/*	if (userNameCheck != null) {
+		} else {
+			User userNameCheck = repositoryUser.findByusernameAndIsDeleted(dtoUser.getEmail(), false);
+			if (userNameCheck != null) {
 				responseMessage = new ResponseMessage(HttpStatus.FOUND.value(), HttpStatus.FOUND,
 						serviceResponse.getMessageByShortAndIsDeleted(MessageLabel.USER_NAME_ALREADY_EXIST, false));
 
 				return responseMessage;
-			} else {*/
+			} else {
 				String[] result = serviceUser.saveorUpdateUser(dtoUser);
 				if (result[0].equalsIgnoreCase(Constant.SUCCESS)) {
 					responseMessage = new ResponseMessage(HttpStatus.CREATED.value(), HttpStatus.CREATED,
@@ -99,17 +100,17 @@ public class ControllerUser {
 				} else {
 					User user = repositoryUser.findByUserId(Integer.parseInt(result[1]));
 					if (user != null) {
-					/*	UserDetail userDetail = repositoryUserDetail.findByUserUserId(user.getUserId());
+						UserDetail userDetail = repositoryUserDetail.findByUserUserId(user.getUserId());
 						if (userDetail != null) {
 							repositoryUserDetail.delete(userDetail);
-						}*/
+						}
 						repositoryUser.delete(user);
 					}
 					responseMessage = new ResponseMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(),
 							HttpStatus.INTERNAL_SERVER_ERROR, result[0]);
 				}
-		//	}
-		//}
+			}
+		}
 		return responseMessage;
 	}
 
@@ -118,12 +119,12 @@ public class ControllerUser {
 	 * @param request
 	 * @param dtoUser
 	 * @return
-	 *//*
+	 */
 	@RequestMapping(value = "/deleteMutipleUsers", method = RequestMethod.POST, produces = "application/json")
 	public ResponseMessage deleteMutipleUsers(HttpServletRequest request, @RequestBody DtoUser dtoUser) {
 		ResponseMessage responseMessage = null;
 		UserSession session = sessionManager.validateUserSessionId(request);
-		if (session == null) {
+		if (session != null) {
 			responseMessage = new ResponseMessage(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED,
 					serviceResponse.getMessageByShortAndIsDeleted(MessageLabel.FORBIDDEN, false));
 			return responseMessage;
@@ -140,22 +141,22 @@ public class ControllerUser {
 		return responseMessage;
 	}
 
-	*//**
+	/**
 	 * @description : Get Users List
 	 * @param request
 	 * @param dtoSearch
 	 * @return
 	 */
-	@RequestMapping(value = "/getUsersList", method = RequestMethod.PUT/*, produces = "application/json"*/)
+	@RequestMapping(value = "/getUsersList", method = RequestMethod.PUT, produces = "application/json")
 	public ResponseMessage getUsersList(HttpServletRequest request, @RequestBody DtoSearch dtoSearch) {
 		DtoRequestResponseLog dtoRequestResponseLog = RequestResponseLogger.logRequest(request, dtoSearch);
 		ResponseMessage responseMessage = null;
-		/*UserSession session = sessionManager.validateUserSessionId(request);
+		UserSession session = sessionManager.validateUserSessionId(request);
 		if (session == null) {
 			responseMessage = new ResponseMessage(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED,
 					serviceResponse.getMessageByShortAndIsDeleted(MessageLabel.FORBIDDEN, false));
 			return responseMessage;
-		} else {*/
+		} else {
 			dtoSearch = serviceUser.getUsersList(dtoSearch);
 			if (dtoSearch.getRecords() != null) {
 				@SuppressWarnings("unchecked")
@@ -169,8 +170,8 @@ public class ControllerUser {
 
 				}
 			}
-	//	}
-//		RequestResponseLogger.logResponse(dtoRequestResponseLog, responseMessage);
+		}
+		RequestResponseLogger.logResponse(dtoRequestResponseLog, responseMessage);
 		return responseMessage;
 	}
 
@@ -912,4 +913,4 @@ public class ControllerUser {
 		}
 		return responseMessage;
 	}*/
-}
+	}

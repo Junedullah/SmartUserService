@@ -21,7 +21,7 @@ public class ResponseMessage {
 	private org.springframework.http.HttpStatus status;
 	private String message;
 	private Object result;
-	private Object btiMessage;
+	private Object smartMessage;
 
 	public ResponseMessage() {
 	}
@@ -45,7 +45,7 @@ public class ResponseMessage {
 	public ResponseMessage(int code, org.springframework.http.HttpStatus status, DtosmartMessage message) {
 		this.code = code;
 		this.status = status;
-		this.btiMessage = message;
+		this.smartMessage = message;
 	}
 
 	/**
@@ -57,7 +57,7 @@ public class ResponseMessage {
 	public ResponseMessage(int code, org.springframework.http.HttpStatus status, DtosmartMessage message, Object result) {
 		this.code = code;
 		this.status = status;
-		this.btiMessage = message;
+		this.smartMessage = message;
 		this.result = result;
 	}
 
@@ -93,13 +93,14 @@ public class ResponseMessage {
 		this.result = result;
 	}
 
-	public Object getBtiMessage() {
-		return btiMessage;
+	public Object getSmartMessage() {
+		return smartMessage;
 	}
 
-	public void setBtiMessage(Object btiMessage) {
-		this.btiMessage = btiMessage;
+	public void setSmartMessage(Object smartMessage) {
+		this.smartMessage = smartMessage;
 	}
 
+	
 }
 
