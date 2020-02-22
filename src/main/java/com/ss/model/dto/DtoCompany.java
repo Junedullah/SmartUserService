@@ -1,13 +1,4 @@
-/**
- * BTI - BAAN for Technology And Trade IntL. 
- * Copyright @ 2017 BTI. 
- * 
- * All rights reserved.
- * 
- * THIS PRODUCT CONTAINS CONFIDENTIAL INFORMATION  OF BTI. 
- * USE, DISCLOSURE OR REPRODUCTION IS PROHIBITED WITHOUT THE 
- * PRIOR EXPRESS WRITTEN PERMISSION OF BTI.
- */
+
 package com.ss.model.dto;
 
 import java.util.List;
@@ -18,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ss.model.Company;
 import com.ss.util.UtilRandomKey;
 
-/*SmartSoftware User - Service */
+/**SmartSoftware User - Service */
 /**
  * Description: The persistent class for the country_master database table.
  * Name of Project: SmartSoftware
