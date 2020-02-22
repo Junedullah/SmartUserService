@@ -1,6 +1,6 @@
 /**SmartSoftware User - Service */
 /**
- * Description: Service Company
+ * Description: The persistent class for the country_master database table.
  * Name of Project: SmartSoftware
  * Created on: March 11, 2020
  * Modified on: March 11, 2020 11:19:38 AM
@@ -22,6 +22,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 //import com.bti.repository.RepositoryCityMaster;
@@ -38,6 +39,7 @@ import com.ss.repository.RepositoryCompany;
 import com.ss.repository.RepositoryException;
 import com.ss.util.CommonUtils;
 import com.ss.util.DatabaseFactory;
+import com.ss.util.UtilRandomKey;
 
 
 
@@ -223,5 +225,137 @@ public class ServiceCompany {
 		return dtoCompany;
 	}
 	
+	public DtoCompany getCompanyByCompanyId(int companyId) {
+		DtoCompany dtoCompany = new DtoCompany();
+		if (companyId > 0) {
+			Company company = repositoryCompany.findByCompanyIdAndIsDeleted(companyId, false);
+			if (company != null) {
+				dtoCompany = new DtoCompany(company);
+			} else {
+				dtoCompany.setMessageType("COMPANY_NOT_GETTING");
+
+			}
+		} else {
+			dtoCompany.setMessageType("INVALID_COMPANY_ID");
+
+		}
+		return dtoCompany;
+	}
+	
+	
+	public DtoCompany getCompanyByTenantId(DtoCompany dtoCompany) {
+		if(dtoCompany.getTenantId() != "" || dtoCompany.getTenantId() != null) {
+		Company company = repositoryCompany.findByTenantIdAndIsDeleted(dtoCompany.getTenantId(), false);
+		if(company != null) {
+			dtoCompany = new DtoCompany();
+			dtoCompany.setName(company.getName());
+		}
+		return dtoCompany;
+		}else {
+			return null;
+		}
+	}
+
+	public boolean getCompanyByCompanyName(String companyName) {
+		   List<Company> list = repositoryCompany.findByNameAndIsDeleted(companyName, false);
+		   return list!=null && !list.isEmpty();
+	}
+	
+	
+	public DtoSearch getAllCompanyListForDropDown(DtoCompany dtoCompany) {
+		DtoSearch dtoSearch = new DtoSearch();
+		dtoSearch.setPageNumber(dtoCompany.getPageNumber());
+		dtoSearch.setPageSize(dtoCompany.getPageSize());
+		dtoSearch.setTotalCount(repositoryCompany.getCountOfTotalCompaniesIsActive());
+		List<Company> companyList = null;
+		if (dtoCompany.getPageNumber() != null && dtoCompany.getPageSize() != null) {
+			Pageable pageable = new PageRequest(dtoCompany.getPageNumber(), dtoCompany.getPageSize());
+			companyList = repositoryCompany.findByIsDeletedAndIsActive(false, pageable, true);
+		} else {
+			companyList = repositoryCompany.findByIsDeletedAndIsActive(false, true);
+		}
+
+		List<DtoCompany> dtoCompanies = new ArrayList<>();
+		if (companyList != null && !companyList.isEmpty()) {
+			for (Company company : companyList) {
+				dtoCompany = new DtoCompany();
+				dtoCompany.setId(company.getCompanyId());
+				dtoCompany.setName(company.getName());
+				dtoCompanies.add(dtoCompany);
+			}
+		}
+		dtoSearch.setRecords(dtoCompanies);
+		return dtoSearch;
+	}
+
+	
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public DtoCompany blockUnblockCompany(DtoCompany dtoCompany) {
+		Company company = this.repositoryCompany.findByCompanyIdAndIsDeleted(dtoCompany.getId(), false);
+		if (company != null) {
+			company.setIsActive(dtoCompany.getIsActive());
+			this.repositoryCompany.saveAndFlush(company);
+		}
+		return dtoCompany;
+	}
+	
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public DtoSearch searchCompanies(DtoSearch dtoSearch)
+	{
+		if(dtoSearch != null)
+		{
+			dtoSearch.setTotalCount(this.repositoryCompany.predictiveCompanySearchTotalCount(dtoSearch.getSearchKeyword()));
+			List<Company> companyList =null;
+			if(dtoSearch.getPageNumber()!=null && dtoSearch.getPageSize()!=null){
+				companyList= this.repositoryCompany.predictiveCompanySearchWithPagination(dtoSearch.getSearchKeyword() , new PageRequest(dtoSearch.getPageNumber(), dtoSearch.getPageSize(), Direction.DESC, "createdDate"));
+			}
+			else{
+				companyList= this.repositoryCompany.predictiveCompanySearchWithPagination(dtoSearch.getSearchKeyword());
+			}
+			
+			if(companyList != null && !companyList.isEmpty()){
+				List<DtoCompany> dtoCompanyList = new ArrayList<>();
+				for (Company company : companyList) {
+					DtoCompany dtoCompany = new DtoCompany(company);
+					if (dtoCompany.getIsActive()) {
+						dtoCompany.setCompanyStatus(
+								serviceResponse.getMessageByShortAndIsDeleted("ACTIVE", false).getMessage());
+					} else {
+						dtoCompany.setCompanyStatus(
+								serviceResponse.getMessageByShortAndIsDeleted("INACTIVE", false).getMessage());
+					}
+					dtoCompanyList.add(dtoCompany);
+				}
+				dtoSearch.setRecords(dtoCompanyList);
+			}
+		}
+		return dtoSearch;
+	}
+	
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public List<DtoCompany> getTotalCompaniesWithTotalUser() {
+		List<DtoCompany> dtoCompanyList = new ArrayList<>();
+		List<Company> companyList = this.repositoryCompany.findByIsDeletedAndIsActive(false,true);
+		if (companyList != null && !companyList.isEmpty()) {
+
+			DtoCompany dtoCompany = null;
+			for (Company company : companyList) {
+				dtoCompany = new DtoCompany();
+				dtoCompany.setId(company.getCompanyId());
+				if (UtilRandomKey.isNotBlank(company.getName())) {
+					dtoCompany.setName(company.getName());
+				} else {
+					dtoCompany.setName("");
+				}
+//				dtoCompany.setTotalUsers(String
+//						.valueOf(repositoryUserCompanyRelation.getCountOfTotalCompaniesUsers(company.getCompanyId())));
+//				dtoCompany.setValue(String
+//						.valueOf(repositoryUserCompanyRelation.getCountOfTotalCompaniesUsers(company.getCompanyId())));
+//				dtoCompanyList.add(dtoCompany);
+			}
+		}
+		return dtoCompanyList;
+	}
+
 	
 }
