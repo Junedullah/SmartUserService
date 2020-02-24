@@ -4,6 +4,7 @@ public class MessageLabel {
 	
 	private MessageLabel(){
 	}
+	
 	public static final String USER_GROUP_FATCHED = "USER_GROUP_FATCHED";
 	public static final String RECORD_NOT_FOUND = "RECORD_NOT_FOUND";
 	public static final String SESSION_EXPIRED = "SESSION_EXPIRED";

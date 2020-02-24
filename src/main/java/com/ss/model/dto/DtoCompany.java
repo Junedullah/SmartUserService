@@ -36,7 +36,7 @@ public class DtoCompany {
 	private String address;
 	private Boolean isActive;
 	private List<Integer> ids;
-//	private DtoUserGroup userGroup;
+	private DtoUserGroup userGroup;
 	private String state;
 	private String city;
 	private String country;
@@ -156,13 +156,13 @@ public class DtoCompany {
 		this.ids = ids;
 	}
 
-//	public DtoUserGroup getUserGroup() {
-//		return userGroup;
-//	}
-//
-//	public void setUserGroup(DtoUserGroup userGroup) {
-//		this.userGroup = userGroup;
-//	}
+	public DtoUserGroup getUserGroup() {
+		return userGroup;
+	}
+
+	public void setUserGroup(DtoUserGroup userGroup) {
+		this.userGroup = userGroup;
+	}
 
 	public String getState() {
 		return state;

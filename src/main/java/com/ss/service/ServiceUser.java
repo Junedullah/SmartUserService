@@ -10,24 +10,35 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.ss.constant.ConfigSetting;
 import com.ss.constant.SmartRoles;
+import com.ss.model.Company;
 import com.ss.model.User;
+import com.ss.model.UserCompanyRelation;
 import com.ss.model.UserDetail;
+import com.ss.model.UserGroup;
 import com.ss.model.UserSession;
+import com.ss.model.dto.DtoCompany;
 import com.ss.model.dto.DtoSearch;
 import com.ss.model.dto.DtoUser;
+import com.ss.model.dto.DtoUserDetail;
+import com.ss.model.dto.DtoUserGroup;
 import com.ss.repository.RepositoryCityMaster;
 import com.ss.repository.RepositoryCountryMaster;
 import com.ss.repository.RepositoryRole;
 import com.ss.repository.RepositoryRoleGroup;
 import com.ss.repository.RepositoryStateMaster;
 import com.ss.repository.RepositoryUser;
+import com.ss.repository.RepositoryUserCompanyRelation;
 import com.ss.repository.RepositoryUserDetail;
 import com.ss.repository.RepositoryUserGroup;
 import com.ss.repository.RepositoryUserSession;
@@ -80,9 +91,12 @@ public class ServiceUser {
 
 	@Autowired
 	ServiceResponse serviceResponse;
-	
+
 	@Autowired
 	RepositoryUserSession repositoryUserSession;
+
+	@Autowired
+	RepositoryUserCompanyRelation repositoryUserCompanies;
 
 	/*@Autowired
 	RepositoryLoginOtp repositoryLoginOtp;
@@ -90,8 +104,7 @@ public class ServiceUser {
 	@Autowired
 	ServiceEmailHandler serviceEmailHandler;
 
-	@Autowired
-	RepositoryUserCompanyRelation repositoryUserCompanies;
+
 
 	@Autowired
 	RepositoryCompany repositoryCompany;
@@ -135,7 +148,7 @@ public class ServiceUser {
 	@Autowired
 	RepositoryModule repositoryModule;
 
-	
+
 
 	@Autowired
 	RepositoryScreenMenu repositoryScreenMenu;
@@ -281,10 +294,10 @@ public class ServiceUser {
 	}
 
 
-	  /**
-	  * Description: delete user (one or more) 
-	  * @param userIds
-	  */
+	/**
+	 * Description: delete user (one or more) 
+	 * @param userIds
+	 */
 	public void deleteMultiPleUsers(List<Integer> userIds) {
 		int loggedInUserId = Integer.parseInt(httpServletRequest.getHeader(USER_ID));
 		if (userIds != null && !userIds.isEmpty()) {
@@ -312,25 +325,22 @@ public class ServiceUser {
 
 
 
+	public DtoUser getUsersDetailByUserId(DtoUser dtoUser2) {
+		String langId = httpServletRequest.getHeader(LANG_ID);
+		User user = repositoryUser.findByUserIdAndIsDeleted(dtoUser2.getUserId(), false);
+		if (user != null) {
+			UserDetail userDetail = repositoryUserDetail.findByUserUserIdAndIsDeleted(user.getUserId(), false);
+			if (userDetail != null) {
+				List<UserCompanyRelation> userCompanyList = repositoryUserCompanies
+						.findByUserUserIdAndIsDeleted(user.getUserId(), false);
+				DtoUser dtoUser = new DtoUser(user, userDetail, langId);
+				dtoUser = setUserCompanyRelationListInDto(userCompanyList, dtoUser);
+				return dtoUser;
+			}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		}
+		return null;
+	}
 
 	/**
 	 * Description: Save User Company Relation List 
@@ -338,7 +348,7 @@ public class ServiceUser {
 	 * @param dtoUser
 	 * @return
 	 */
-	/*	public DtoUser setUserCompanyRelationListInDto(List<UserCompanyRelation> userCompaniesList, DtoUser dtoUser) {
+	public DtoUser setUserCompanyRelationListInDto(List<UserCompanyRelation> userCompaniesList, DtoUser dtoUser) {
 		String userGroupName = "";
 		List<DtoCompany> listOfCompanies = new ArrayList<>();
 		List<Integer> companyIds = new ArrayList<>();
@@ -386,7 +396,28 @@ public class ServiceUser {
 		return dtoUser;
 	}
 
-	 *//**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	/**
 	 * Description: get user List 
 	 * @param dtoSearch
 	 * @return
@@ -432,11 +463,12 @@ public class ServiceUser {
 		return dtoSearch2;
 	}
 
+
 	/**
 	 * Description: get user list for drop down
 	 * @param dtoSearch
 	 * @return
-	 *//*
+	 */
 	public DtoSearch getUsersListForDropDown(DtoSearch dtoSearch) {
 		String langId = httpServletRequest.getHeader(LANG_ID);
 		DtoSearch dtoSearch2 = new DtoSearch();
@@ -486,6 +518,41 @@ public class ServiceUser {
 		dtoSearch2.setRecords(dtoList);
 		return dtoSearch2;
 	}
+
+
+	/**
+	 * Description: search user by search keyword 
+	 * @param dtoSearch
+	 * @return
+	 */
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	public DtoSearch searchUsers(DtoSearch dtoSearch) {
+		String langId = httpServletRequest.getHeader(LANG_ID);
+		if (dtoSearch != null) {
+			dtoSearch.setTotalCount(this.repositoryUserDetail
+					.predictiveUserSearchTotalCount(dtoSearch.getSearchKeyword(), SmartRoles.USER.getIndex()));
+			List<UserDetail> userDetailList = this.repositoryUserDetail.predictiveUserSearchWithPagination(
+					dtoSearch.getSearchKeyword(),
+					new PageRequest(dtoSearch.getPageNumber(), dtoSearch.getPageSize(), Direction.DESC, "createdDate"),
+					SmartRoles.USER.getIndex());
+			if (userDetailList != null && !userDetailList.isEmpty()) {
+				List<DtoUser> dtoUserList = new ArrayList<>();
+				DtoUser dtoUser = null;
+				User user = null;
+				for (UserDetail userDetail : userDetailList) {
+					user = userDetail.getUser();
+					dtoUser = new DtoUser(user, userDetail, langId);
+					// get company list
+					dtoUser = setUserCompanyRelationListInDto(this.repositoryUserCompanies
+							.findByUserUserIdAndIsDeleted(user != null ? user.getUserId() : -1, false), dtoUser);
+					dtoUserList.add(dtoUser);
+				}
+				dtoSearch.setRecords(dtoUserList);
+			}
+		}
+		return dtoSearch;
+	}
+
 
 	public DtoSearch getAllUsersList(DtoSearch dtoSearch) 
 	{
@@ -538,59 +605,9 @@ public class ServiceUser {
 		return dtoSearch2;
 	}
 
-	  *//**
-	  * Description: get User detail by user id 
-	  * @param dtoUser2
-	  * @return
-	  *//*
-	public DtoUser getUsersDetailByUserId(DtoUser dtoUser2) {
-		String langId = httpServletRequest.getHeader(LANG_ID);
-		User user = repositoryUser.findByUserIdAndIsDeleted(dtoUser2.getUserId(), false);
-		if (user != null) {
-			UserDetail userDetail = repositoryUserDetail.findByUserUserIdAndIsDeleted(user.getUserId(), false);
-			if (userDetail != null) {
-				List<UserCompanyRelation> userCompanyList = repositoryUserCompanies
-						.findByUserUserIdAndIsDeleted(user.getUserId(), false);
-				DtoUser dtoUser = new DtoUser(user, userDetail, langId);
-				dtoUser = setUserCompanyRelationListInDto(userCompanyList, dtoUser);
-				return dtoUser;
-			}
-
-		}
-		return null;
-	}
-
-	   *//**
-	   * Description: get User detail by user id 
-	   * @param userId
-	   * @return
-	   *//*
-	public DtoUser getUserDetailByid(int userId) {
-		String langId = httpServletRequest.getHeader(LANG_ID);
-		User user = repositoryUser.findByUserIdAndIsDeleted(userId, false);
-		DtoUser dtoUser = new DtoUser();
-		if (user != null) {
-			UserDetail userDetail = repositoryUserDetail.findByUserUserIdAndIsDeleted(user.getUserId(), false);
-			if (userDetail != null) {
-				List<UserCompanyRelation> userCompaniesList = repositoryUserCompanies
-						.findByUserUserIdAndIsDeleted(user.getUserId(), false);
-				dtoUser = new DtoUser(user, userDetail, langId);
-				dtoUser = setUserCompanyRelationListInDto(userCompaniesList, dtoUser);
-			}
-		}
-		return dtoUser;
-	}
-
-	    *//**
-	    * @return
-	    *//*
-	public List<UserGroup> getUserGroupsList() {
-		return repositoryUserGroup.findByIsDeleted(false);
-	}
-
-	     *//**
-	     * @return
-	     *//*
+	/**
+	 * @return
+	 */
 	public List<DtoUserDetail> getUserDetailList() {
 		String langId = httpServletRequest.getHeader("langid");
 		List<DtoUserDetail> dtoUserDetails = new ArrayList<>();
@@ -621,14 +638,103 @@ public class ServiceUser {
 		return dtoUserDetails;
 	}
 
-	      *//**
-	      * @return
-	      *//*
+	public DtoSearch getActiveSessionUsersList(DtoSearch dtoSearch, UserSession currenUserSession) 
+	{
+		String langId = httpServletRequest.getHeader(LANG_ID);
+		DtoSearch dtoSearch2 = new DtoSearch();
+		dtoSearch2.setPageNumber(dtoSearch.getPageNumber());
+		dtoSearch2.setPageSize(dtoSearch.getPageSize());
+		List<UserSession> userSessionList = new ArrayList<>();
+		if (dtoSearch.getPageNumber() != null && dtoSearch.getPageSize() != null) {
+			Pageable pageable = new PageRequest(dtoSearch.getPageNumber(), dtoSearch.getPageSize());
+			Page<UserSession> pageSession  = repositoryUserSession.findAll(pageable);
+			if(pageSession!=null && !pageSession.getContent().isEmpty()){
+				userSessionList=pageSession.getContent();
+			}
+		} else {
+			userSessionList =repositoryUserSession.findAll();
+
+		}
+
+		List<DtoUser> dtoList = new ArrayList<>();
+		if (userSessionList != null && !userSessionList.isEmpty()) {
+			for (UserSession userSession : userSessionList) 
+			{
+				if(currenUserSession.getSessionId()!=userSession.getSessionId())
+				{
+					UserDetail userDetail = repositoryUserDetail.findByUserUserIdAndIsDeleted(userSession.getUser().getUserId(), false);
+					if (userDetail != null) 
+					{
+						DtoUser dtoUser = new DtoUser(userSession.getUser(), userDetail, langId);
+						if (dtoUser.getIsActive()) {
+							dtoUser.setUserStatus(
+									serviceResponse.getMessageByShortAndIsDeleted("ACTIVE", false).getMessage());
+						} else {
+							dtoUser.setUserStatus(
+									serviceResponse.getMessageByShortAndIsDeleted("INACTIVE", false).getMessage());
+						}
+						dtoUser.setSession(userSession.getSession());
+						dtoUser.setSessionExpireDate("");
+						if(userSession.getExpireDate()!=null){
+							dtoUser.setSessionExpireDate(UtilDateAndTime.dateToStringddmmyyyy(userSession.getExpireDate()));
+						}
+						dtoUser.setCompanyTenantId("");
+						if(UtilRandomKey.isNotBlank(userSession.getCompnayTenantId())){
+							dtoUser.setCompanyTenantId(userSession.getCompnayTenantId());
+						}
+						dtoList.add(dtoUser);
+					}
+				}
+			}
+		}
+		dtoSearch2.setTotalCount(dtoList.size());
+		dtoSearch2.setRecords(dtoList);
+		return dtoSearch2;
+	}
+	
+
+
+
+	/**
+	 * Description: get User detail by user id 
+	 * @param dtoUser2
+	 * @return
+	 *//**
+	 * Description: get User detail by user id 
+	 * @param userId
+	 * @return
+	 *//*
+	public DtoUser getUserDetailByid(int userId) {
+		String langId = httpServletRequest.getHeader(LANG_ID);
+		User user = repositoryUser.findByUserIdAndIsDeleted(userId, false);
+		DtoUser dtoUser = new DtoUser();
+		if (user != null) {
+			UserDetail userDetail = repositoryUserDetail.findByUserUserIdAndIsDeleted(user.getUserId(), false);
+			if (userDetail != null) {
+				List<UserCompanyRelation> userCompaniesList = repositoryUserCompanies
+						.findByUserUserIdAndIsDeleted(user.getUserId(), false);
+				dtoUser = new DtoUser(user, userDetail, langId);
+				dtoUser = setUserCompanyRelationListInDto(userCompaniesList, dtoUser);
+			}
+		}
+		return dtoUser;
+	}
+
+	  *//**
+	  * @return
+	  *//*
+	public List<UserGroup> getUserGroupsList() {
+		return repositoryUserGroup.findByIsDeleted(false);
+	}
+
+	   *//**
+	   * @return
+	   *//*
 	public List<RoleGroup> getRoleGroupsList() {
 		return repositoryRoleGroup.findByIsDeleted(false);
 	}
 
-	       */
+	    */
 	/**
 	 * @param index
 	 * @return
@@ -637,12 +743,12 @@ public class ServiceUser {
 		return repositoryUser.findByRoleRoleIdAndIsDeleted(index, false);
 	}
 
-	
-	   *//**
-	   * @param dtoUser
-	   * @param userDb
-	   * @return
-	   *//*
+
+	  *//**
+	  * @param dtoUser
+	  * @param userDb
+	  * @return
+	  *//*
 	public DtoUser validateUserPassword(DtoUser dtoUser, User userDb) {
 		if (passwordEncoder.matches(dtoUser.getPassword(), userDb.getPassword())) {
 			dtoUser.setUserId(userDb.getUserId());
@@ -653,11 +759,11 @@ public class ServiceUser {
 	}
 
 
-	    *//**
-	    * @param password
-	    * @param userExist
-	    * @return
-	    *//*
+	   *//**
+	   * @param password
+	   * @param userExist
+	   * @return
+	   *//*
 	public boolean changeUserPasswordAndSendEmail(String password, User userExist) {
 		if (userExist != null && userExist.getEmail() != null) {
 			userExist.setPassword(passwordEncoder.encode(password));
@@ -674,11 +780,11 @@ public class ServiceUser {
 		}
 	}
 
-	     *//**
-	     * Description: send otp to user 
-	     * @param dtoUserData
-	     * @return
-	     *//*
+	    *//**
+	    * Description: send otp to user 
+	    * @param dtoUserData
+	    * @return
+	    *//*
 	public DtoUser sendOTPtoUser(DtoUser dtoUserData) {
 		DtoUser dtoUserLogin = new DtoUser();
 		User user3 = repositoryUser.findByusernameAndIsDeleted(dtoUserData.getUserName(), false);
@@ -776,12 +882,12 @@ public class ServiceUser {
 		return dtoUserLogin;
 	}
 
-	      *//**
-	      * Description: save Authorization setting
-	      * @param dtoAuthorization
-	      * @return
-	      * @throws ParseException
-	      *//*
+	     *//**
+	     * Description: save Authorization setting
+	     * @param dtoAuthorization
+	     * @return
+	     * @throws ParseException
+	     *//*
 	public DtoAuthorizationDetail saveAuthorizationDetail(DtoAuthorizationDetail dtoAuthorization)
 			throws ParseException {
 		AuthorizationSetting authorizationDetail = new AuthorizationSetting();
@@ -805,10 +911,10 @@ public class ServiceUser {
 		return dtoAuthorization;
 	}
 
-	       *//**
-	       * @param dtoUserIp
-	       * @return
-	       *//*
+	      *//**
+	      * @param dtoUserIp
+	      * @return
+	      *//*
 	public DtoUserIp setUserIPForAuthentication(DtoUserIp dtoUserIp) {
 
 		WhitelistIp whitelistIp = new WhitelistIp();
@@ -834,10 +940,10 @@ public class ServiceUser {
 		return dtoUserIp;
 	}
 
-	        *//**
-	        * @param dtoUserIp
-	        * @return
-	        *//*
+	       *//**
+	       * @param dtoUserIp
+	       * @return
+	       *//*
 	public Boolean updateUserIPForAuthentication(DtoUserIp dtoUserIp) {
 		Boolean isUpdate = false;
 		WhitelistIp whitelistIp = repositoryWhiteListIp.findOne(dtoUserIp.getId());
@@ -859,52 +965,19 @@ public class ServiceUser {
 		return isUpdate;
 	}
 
-	         *//**
-	         * @param userName
-	         * @return
-	         *//*
+	        *//**
+	        * @param userName
+	        * @return
+	        *//*
 	public User getUserDetailByUserName(String userName) {
 		return this.repositoryUser.findByusernameAndIsDeleted(userName, false);
 	}
 
-	          *//**
-	          * Description: search user by search keyword 
-	          * @param dtoSearch
-	          * @return
-	          *//*
-	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
-	public DtoSearch searchUsers(DtoSearch dtoSearch) {
-		String langId = httpServletRequest.getHeader(LANG_ID);
-		if (dtoSearch != null) {
-			dtoSearch.setTotalCount(this.repositoryUserDetail
-					.predictiveUserSearchTotalCount(dtoSearch.getSearchKeyword(), SmartRoles.USER.getIndex()));
-			List<UserDetail> userDetailList = this.repositoryUserDetail.predictiveUserSearchWithPagination(
-					dtoSearch.getSearchKeyword(),
-					new PageRequest(dtoSearch.getPageNumber(), dtoSearch.getPageSize(), Direction.DESC, "createdDate"),
-					SmartRoles.USER.getIndex());
-			if (userDetailList != null && !userDetailList.isEmpty()) {
-				List<DtoUser> dtoUserList = new ArrayList<>();
-				DtoUser dtoUser = null;
-				User user = null;
-				for (UserDetail userDetail : userDetailList) {
-					user = userDetail.getUser();
-					dtoUser = new DtoUser(user, userDetail, langId);
-					// get company list
-					dtoUser = setUserCompanyRelationListInDto(this.repositoryUserCompanies
-							.findByUserUserIdAndIsDeleted(user != null ? user.getUserId() : -1, false), dtoUser);
-					dtoUserList.add(dtoUser);
-				}
-				dtoSearch.setRecords(dtoUserList);
-			}
-		}
-		return dtoSearch;
-	}
-
-	           *//**
-	           * This methods blocks/unblocks user
-	           * @param dtoWhiteListIp
-	           * @return
-	           *//*
+	         *//**
+	         * This methods blocks/unblocks user
+	         * @param dtoWhiteListIp
+	         * @return
+	         *//*
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
 	public DtoUser blockUnblockUser(DtoUser dtoUser) {
 		User user = this.repositoryUser.findByUserIdAndIsDeleted(dtoUser.getUserId(), false);
@@ -915,9 +988,9 @@ public class ServiceUser {
 		return dtoUser;
 	}
 
-	            *//**
-	            * @param user
-	            *//*
+	          *//**
+	          * @param user
+	          *//*
 	public void resetPassword(User user) {
 		String randomPassword = UtilRandomKey.getRandomOrderNumber();
 		user.setPassword(passwordEncoder.encode(randomPassword));
@@ -926,11 +999,11 @@ public class ServiceUser {
 		serviceEmailHandler.sendResetPasswordMailByAdmin(user.getEmail(), randomPassword, user.getUsername());
 	}
 
-	             *//**
-	             * Description: update admin profile
-	             * @param dtoUser
-	             * @return
-	             *//*
+	           *//**
+	           * Description: update admin profile
+	           * @param dtoUser
+	           * @return
+	           *//*
 	public String[] updateAdminProfile(DtoUser dtoUser) 
 	{
 		int loggedInUserId = Integer.parseInt(httpServletRequest.getHeader(USER_ID));
@@ -971,11 +1044,11 @@ public class ServiceUser {
 		}
 	}
 
-	              *//**
-	              * Description: get admin profile detail
-	              * @param dtoUser2
-	              * @return
-	              *//*
+	            *//**
+	            * Description: get admin profile detail
+	            * @param dtoUser2
+	            * @return
+	            *//*
 	public DtoUser getAdminProfileDetail(DtoUser dtoUser2) 
 	{
 		String langId = httpServletRequest.getHeader(LANG_ID);
@@ -990,12 +1063,12 @@ public class ServiceUser {
 	}
 
 
-	               *//**
-	               * Description: save mac address
-	               * @param macAddress
-	               * @param user
-	               * @return
-	               *//*
+	             *//**
+	             * Description: save mac address
+	             * @param macAddress
+	             * @param user
+	             * @return
+	             *//*
 	public boolean saveMacAddress(DtoUser dtoUser, User user) 
 	{
 		UserMacAddress userMacAddress=null;
@@ -1022,11 +1095,11 @@ public class ServiceUser {
 		}
 	}
 
-	                *//**
-	                * Description: delete mac address 
-	                * @param dtoUser
-	                * @return
-	                *//*
+	              *//**
+	              * Description: delete mac address 
+	              * @param dtoUser
+	              * @return
+	              *//*
 	public boolean deleteMacAddressOfUser(DtoUser dtoUser) 
 	{
 		int loggedInUserId = Integer.parseInt(httpServletRequest.getHeader(USER_ID));
@@ -1393,59 +1466,5 @@ public class ServiceUser {
 	}
 
 
-	public DtoSearch getActiveSessionUsersList(DtoSearch dtoSearch, UserSession currenUserSession) 
-	{
-		String langId = httpServletRequest.getHeader(LANG_ID);
-		DtoSearch dtoSearch2 = new DtoSearch();
-		dtoSearch2.setPageNumber(dtoSearch.getPageNumber());
-		dtoSearch2.setPageSize(dtoSearch.getPageSize());
-		List<UserSession> userSessionList = new ArrayList<>();
-		if (dtoSearch.getPageNumber() != null && dtoSearch.getPageSize() != null) {
-			Pageable pageable = new PageRequest(dtoSearch.getPageNumber(), dtoSearch.getPageSize());
-			Page<UserSession> pageSession  = repositoryUserSession.findAll(pageable);
-			if(pageSession!=null && !pageSession.getContent().isEmpty()){
-				userSessionList=pageSession.getContent();
-			}
-		} else {
-			userSessionList =repositoryUserSession.findAll();
-
-		}
-
-		List<DtoUser> dtoList = new ArrayList<>();
-		if (userSessionList != null && !userSessionList.isEmpty()) {
-			for (UserSession userSession : userSessionList) 
-			{
-				if(currenUserSession.getSessionId()!=userSession.getSessionId())
-				{
-					UserDetail userDetail = repositoryUserDetail.findByUserUserIdAndIsDeleted(userSession.getUser().getUserId(), false);
-					if (userDetail != null) 
-					{
-						DtoUser dtoUser = new DtoUser(userSession.getUser(), userDetail, langId);
-						if (dtoUser.getIsActive()) {
-							dtoUser.setUserStatus(
-									serviceResponse.getMessageByShortAndIsDeleted("ACTIVE", false).getMessage());
-						} else {
-							dtoUser.setUserStatus(
-									serviceResponse.getMessageByShortAndIsDeleted("INACTIVE", false).getMessage());
-						}
-						dtoUser.setSession(userSession.getSession());
-						dtoUser.setSessionExpireDate("");
-						if(userSession.getExpireDate()!=null){
-							dtoUser.setSessionExpireDate(UtilDateAndTime.dateToStringddmmyyyy(userSession.getExpireDate()));
-						}
-						dtoUser.setCompanyTenantId("");
-						if(UtilRandomKey.isNotBlank(userSession.getCompnayTenantId())){
-							dtoUser.setCompanyTenantId(userSession.getCompnayTenantId());
-						}
-						dtoList.add(dtoUser);
-					}
-				}
-			}
-
-		}
-		dtoSearch2.setTotalCount(dtoList.size());
-		dtoSearch2.setRecords(dtoList);
-		return dtoSearch2;
+	*/
 	}
-	 */
-}
