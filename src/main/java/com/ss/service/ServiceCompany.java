@@ -1,9 +1,9 @@
 /**SmartSoftware User - Service */
 /**
- * Description: The persistent class for the country_master database table.
+ * Description: The persistent class for the company.
  * Name of Project: SmartSoftware
- * Created on: March 11, 2020
- * Modified on: March 11, 2020 11:19:38 AM
+ * Created on:fab 11, 2020
+ * Modified on: fab 11, 2020 11:19:38 AM
  * @author shahnawaz
  * Version: 
  */
@@ -35,8 +35,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ss.model.Company;
 import com.ss.model.dto.DtoCompany;
 import com.ss.model.dto.DtoSearch;
+import com.ss.repository.RepositoryCityMaster;
 import com.ss.repository.RepositoryCompany;
+import com.ss.repository.RepositoryCountryMaster;
 import com.ss.repository.RepositoryException;
+import com.ss.repository.RepositoryStateMaster;
 import com.ss.util.CommonUtils;
 import com.ss.util.DatabaseFactory;
 import com.ss.util.UtilRandomKey;
@@ -63,14 +66,14 @@ public class ServiceCompany {
 	@Autowired(required = false)
 	HttpServletRequest httpServletRequest;
 
-//	@Autowired
-//	RepositoryCountryMaster repositoryCountryMaster;
-//
-//	@Autowired
-//	RepositoryCityMaster repositoryCityMaster;
-//
-//	@Autowired
-//	RepositoryStateMaster repositoryStateMaster;
+	@Autowired
+	RepositoryCountryMaster repositoryCountryMaster;
+
+	@Autowired
+	RepositoryCityMaster repositoryCityMaster;
+
+	@Autowired
+	RepositoryStateMaster repositoryStateMaster;
 //
 //	@Autowired
 //	RepositoryUserCompanyRelation repositoryUserCompanyRelation;
@@ -146,10 +149,10 @@ public class ServiceCompany {
 		company.setLatitude(dtoCompany.getLatitude());
 		company.setLongitude(dtoCompany.getLongitude());
 		company.setCompanyCode(dtoCompany.getCompanyCode());
-//		company.setStateMaster(repositoryStateMaster.findOne(dtoCompany.getStateId()));
-//		company.setCityMaster(repositoryCityMaster.findOne(dtoCompany.getCityId()));
-//		company.setCountryMaster(
-//				repositoryCountryMaster.findByCountryIdAndIsDeletedAndIsActive(dtoCompany.getCountryId(), false, true));
+		company.setStateMaster(repositoryStateMaster.findOne(dtoCompany.getStateId()));
+		company.setCityMaster(repositoryCityMaster.findOne(dtoCompany.getCityId()));
+		company.setCountryMaster(
+				repositoryCountryMaster.findByCountryIdAndIsDeletedAndIsActive(dtoCompany.getCountryId(), false, true));
 		company.setCountryCode(dtoCompany.getCountryCode());
 		company = repositoryCompany.saveAndFlush(company);
 
@@ -357,5 +360,6 @@ public class ServiceCompany {
 		return dtoCompanyList;
 	}
 
+	
 	
 }
