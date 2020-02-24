@@ -11,10 +11,10 @@ import com.ss.util.UtilRandomKey;
 
 /**SmartSoftware User - Service */
 /**
- * Description: The persistent class for the country_master database table.
+ * Description: The persistent class for the dtocompany.
  * Name of Project: SmartSoftware
- * Created on: March 11, 2020
- * Modified on: March 11, 2020 11:19:38 AM
+ * Created on: fab 11, 2020
+ * Modified on:fab 11, 2020 11:19:38 AM
  * @author shahnawaz
  * Version: 
  */
