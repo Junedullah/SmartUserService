@@ -4,7 +4,7 @@ public class MessageLabel {
 	
 	private MessageLabel(){
 	}
-	
+	 
 	public static final String USER_GROUP_FATCHED = "USER_GROUP_FATCHED";
 	public static final String RECORD_NOT_FOUND = "RECORD_NOT_FOUND";
 	public static final String SESSION_EXPIRED = "SESSION_EXPIRED";
@@ -68,7 +68,7 @@ public class MessageLabel {
 	public static final String BAD_REQUEST = "BAD_REQUEST";
 	public static final String REPORT_LIST_OF_ROLE_ACCESS_GET = "REPORT_LIST_OF_ROLE_ACCESS_GET";
 	public static final String REPORT_LIST_OF_ROLE_ACCESS_NOT_FOUND = "REPORT_LIST_OF_ROLE_ACCESS_NOT_FOUND";
-	public static final String SCREEN_DETAIL_NOT_FOUND = "SCREEN_DETAIL_NOT_FOUND";
+	public static final String SCREEN_DETAIL_NOT_FOUND = "SCREEN_DETAIL_NOT_FOUND"; 
 	public static final String SCREEN_DETAILS_FAIL = "SCREEN_DETAILS_FAIL";
 	public static final String REPORT_LIST_OF_ROLE_ACCESS_GET_SUCCESS = "REPORT_LIST_OF_ROLE_ACCESS_GET_SUCCESS";
 	public static final String RECORD_GET_SUCCESSFULLY = "RECORD_GET_SUCCESSFULLY";
