@@ -57,7 +57,7 @@ public class MessageLabel {
 	public static final String USER_PASSWORD_RESET = "USER_PASSWORD_RESET";
 	public static final String USER_NOT_FOUND = "USER_NOT_FOUND";
 	public static final String IP_FETCHED = "IP_FETCHED";
-	public static final String IP_NOT_FETCHED = "IP_NOT_FETCHED";
+	public static final String IP_NOT_FETCHED = "IP_NOT_FETCHED"; 
 	public static final String CHANGE_PASSWORD = "CHANGE_PASSWORD";
 	public static final String PASSWORD_IS_BLANK = "PASSWORD_IS_BLANK";
 	public static final String OLD_PASSWORD_MATCH = "OLD_PASSWORD_MATCH";
