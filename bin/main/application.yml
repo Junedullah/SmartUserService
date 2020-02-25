@@ -39,33 +39,33 @@ spring:
     maximum-pool-size: 200
     max-age: 10000
     connection-timeout: 3000000
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: com.mysql.jdbc.Driver
 
 
   jpa:
     show-sql: true
     database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
-      ddl-auto: update  
-#ddl-auto:  create
+      ddl-auto: update #create 
+
 
 server:
    port: 8081
 
-smtp:
-  protocol : smtp
-  host: smtp.gmail.com
-  username: jbaig29@gmail.com
-  password: 'juned@1234'
-  port: 587
-  sender: SmartSoft
+#smtp:
+#  protocol : smtp
+#  host: smtp.office365.com
+#  username: erp.support@bti.com.sa
+#  password: 'Bti123789'
+#  port: 587
+#  sender: BTI
 #
 script:
   #path: D:\\FB\\bti2.sql
   path:  E:\\HCM by Juned\\CODE BACK UP\\userDb\\smartuser.sql
   accesspath: http://localhost:8082
   accessfinancialpath: http://localhost:8085
-  dbSuffix: _company
+  dbSuffix: _algoras  
 
 dbpath:
 #  dbcreation: 'jdbc:mysql://btidb.algoras.com/?useSSL=false&user=bti_user_user&password=aVlsZB8s8ELMGVKO'

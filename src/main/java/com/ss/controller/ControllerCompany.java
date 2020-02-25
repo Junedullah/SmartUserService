@@ -1,4 +1,13 @@
-
+/**
+ * BTI - BAAN for Technology And Trade IntL. 
+ * Copyright @ 2017 BTI. 
+ * 
+ * All rights reserved.
+ * 
+ * THIS PRODUCT CONTAINS CONFIDENTIAL INFORMATION  OF BTI. 
+ * USE, DISCLOSURE OR REPRODUCTION IS PROHIBITED WITHOUT THE 
+ * PRIOR EXPRESS WRITTEN PERMISSION OF BTI.
+ */
 
 package com.ss.controller;
 
@@ -11,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ss.authetication.SessionManager;
 import com.ss.config.ResponseMessage;
 import com.ss.constant.MessageLabel;
 import com.ss.model.Company;
@@ -38,8 +46,8 @@ public class ControllerCompany {
 	@Autowired
 	ServiceCompany serviceCompnay;
 
-	@Autowired
-	SessionManager sessionManager;
+//	@Autowired
+//	SessionManager sessionManager;
 
 	@Autowired
 	ServiceResponse serviceResponse;
@@ -56,8 +64,8 @@ public class ControllerCompany {
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public ResponseMessage createCompany(HttpServletRequest request, @RequestBody DtoCompany dtoCompany) {
 		ResponseMessage responseMessage = null;
-		UserSession session = sessionManager.validateUserSessionId(request);
-		if (session != null) {
+		/*UserSession session = sessionManager.validateUserSessionId(request);
+		if (session != null) {*/
 
 			Company company = repositoryCompany.findTop1ByIsDeletedAndIsActiveAndName(false, true,
 					dtoCompany.getName());
@@ -78,12 +86,12 @@ public class ControllerCompany {
 						dtoCompany);
 			}
 
-		
-		  { responseMessage = new ResponseMessage(HttpStatus.UNAUTHORIZED.value(),
-		  HttpStatus.UNAUTHORIZED,
-		  serviceResponse.getMessageByShortAndIsDeleted(MessageLabel.FORBIDDEN,
-		  false)); }
-		 }
+		/*
+		 * { responseMessage = new ResponseMessage(HttpStatus.UNAUTHORIZED.value(),
+		 * HttpStatus.UNAUTHORIZED,
+		 * serviceResponse.getMessageByShortAndIsDeleted(MessageLabel.FORBIDDEN,
+		 * false)); }
+		 */
 		return responseMessage;
 	}
 

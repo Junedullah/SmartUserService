@@ -23,7 +23,7 @@ import javax.persistence.Table;
 
 
 @Entity @org.hibernate.annotations.Entity(dynamicInsert = true)
-@Table(name = "roles")
+@Table(name = "role")
 @NamedQuery(name = "Role.findAll", query = "SELECT r FROM Role r")
 public class Role extends BaseEntity implements Serializable {
 	private static final long serialVersionUID = 1L;

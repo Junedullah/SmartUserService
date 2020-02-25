@@ -1,11 +1,12 @@
-/**SmartSoftware User - Service */
 /**
- * Description: Company model
- * Name of Project: SmartSoftware
- * Created on: March 11, 2020
- * Modified on: March 11, 2020 11:19:38 AM
- * @author shahnawaz
- * Version: 
+ * BTI - BAAN for Technology And Trade IntL. 
+ * Copyright @ 2017 BTI. 
+ * 
+ * All rights reserved.
+ * 
+ * THIS PRODUCT CONTAINS CONFIDENTIAL INFORMATION  OF BTI. 
+ * USE, DISCLOSURE OR REPRODUCTION IS PROHIBITED WITHOUT THE 
+ * PRIOR EXPRESS WRITTEN PERMISSION OF BTI.
  */
 package com.ss.model;
 
@@ -29,7 +30,15 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Where;
 
-
+/**SmartSoftware User - Service */
+/**
+ * Description: The persistent class for the country_master database table.
+ * Name of Project: SmartSoftware
+ * Created on: March 11, 2020
+ * Modified on: March 11, 2020 11:19:38 AM
+ * @author shahnawaz
+ * Version: 
+ */
 @Entity @org.hibernate.annotations.Entity(dynamicInsert = true)
 @NamedQuery(name = "Company.findAll", query = "SELECT c FROM Company c")
 public class Company extends BaseEntity implements Serializable {
