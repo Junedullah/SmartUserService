@@ -39,7 +39,7 @@ spring:
     maximum-pool-size: 200
     max-age: 10000
     connection-timeout: 3000000
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: com.mysql.jdbc.Driver
 
 
   jpa:
