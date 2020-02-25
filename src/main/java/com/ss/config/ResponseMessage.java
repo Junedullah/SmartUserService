@@ -21,7 +21,7 @@ public class ResponseMessage {
 	private org.springframework.http.HttpStatus status;
 	private String message;
 	private Object result;
-	private Object smartMessage;
+	private Object btiMessage;
 
 	public ResponseMessage() {
 	}
@@ -97,8 +97,8 @@ public class ResponseMessage {
 		return smartMessage;
 	}
 
-	public void setSmartMessage(Object smartMessage) {
-		this.smartMessage = smartMessage;
+	public void setSmartMessage(Object btiMessage) {
+		this.btiMessage = btiMessage;
 	}
 
 	
