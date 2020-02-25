@@ -17,7 +17,7 @@ import com.ss.model.SmartMessage;
 public class DtosmartMessage {
 	private String messagePrimary;
 	private String messageSecondary;
-	private String message;
+	private String message; 
 	private String messageShort;
 
 	public DtosmartMessage(SmartMessage message) {
