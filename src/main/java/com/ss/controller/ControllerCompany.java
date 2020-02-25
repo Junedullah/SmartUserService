@@ -26,7 +26,7 @@ import com.ss.service.ServiceResponse;
 /**
  * Description: The persistent class for the country_master database table.
  * Name of Project: SmartSoftware
- * Created on: March 11, 2020
+ * Created on: March 11, 2020 
  * Modified on: March 11, 2020 11:19:38 AM
  * @author shahnawaz
  * Version: 
